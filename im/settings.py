@@ -17,6 +17,8 @@ ALLOWED_HOSTS = []
 
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',
+    'http://localhost:3001',
+    'http://192.168.0.51:3000'
 ]
 
 
@@ -30,7 +32,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'corsheaders',
-    'counterparties'
+    'import_export',
+    'counterparties',
 ]
 
 MIDDLEWARE = [
