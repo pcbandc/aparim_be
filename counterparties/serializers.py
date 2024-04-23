@@ -17,7 +17,7 @@ class AgreementSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Agreement
-        fields = ['public_id', 'short_name', 'number', 'commencement_date',
+        fields = ['id', 'short_name', 'number', 'commencement_date',
                   'expiration_date', 'payment_delay_days', 'total_value',
                   'counterparty', 'type', 'description']
 
@@ -27,7 +27,7 @@ class ContactPersonSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ContactPerson
-        fields = ['public_id', 'short_name', 'agreement', 'full_name',
+        fields = ['id', 'short_name', 'agreement', 'full_name',
                   'position', 'notes']
 
 
@@ -36,5 +36,5 @@ class ContactSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Contact
-        fields = ['public_id', 'short_name', 'contact_person', 'type',
+        fields = ['id', 'short_name', 'contact_person', 'type',
                   'value', 'notes']

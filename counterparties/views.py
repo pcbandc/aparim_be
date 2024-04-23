@@ -66,7 +66,7 @@ class AgreementDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     def put(self, request, pk, format=None):
         agreement = Agreement.objects.get(public_id=pk)
         if agreement:
-            serializer = CounterpartySerializer(agreement, data=request.data)
+            serializer = AgreementSerializer(agreement, data=request.data)
             if serializer.is_valid():
                 serializer.save()
                 return Response(serializer.data)

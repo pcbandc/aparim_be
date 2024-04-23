@@ -55,14 +55,14 @@ class ContactPerson(models.Model):
     notes = models.CharField(max_length=500, blank=True, null=True)
 
     def __str__(self):
-        return self.short_name
+        return f'{self.short_name} - {self.agreement.counterparty} - {self.agreement.short_name}'
 
 
 class Contact(models.Model):
     public_id = models.UUIDField(db_index=True, unique=True, default=uuid.uuid4)
     short_name = models.CharField(max_length=100)
     contact_person = models.ForeignKey(ContactPerson, on_delete=models.CASCADE, related_name='contacts')
-    type = models.CharField(max_length=32, choices=AGREEMENT_TYPES)
+    type = models.CharField(max_length=32, choices=CONTACT_TYPES)
     value = models.CharField(max_length=100, blank=True, null=True)
     notes = models.CharField(max_length=100, blank=True, null=True)
 
