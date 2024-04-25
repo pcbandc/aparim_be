@@ -14,6 +14,7 @@ class CounterpartySerializer(serializers.ModelSerializer):
 
 class AgreementSerializer(serializers.ModelSerializer):
     id = serializers.UUIDField(source='public_id', read_only=True, format='hex')
+    counterparty = serializers.UUIDField(source='counterparty.public_id', read_only=True, format='hex')
 
     class Meta:
         model = Agreement

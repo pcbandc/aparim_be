@@ -40,7 +40,7 @@ class Agreement(models.Model):
     total_value = models.DecimalField(default=0, max_digits=14, decimal_places=2)
     counterparty = models.ForeignKey(Counterparty, on_delete=models.CASCADE, related_name='agreements')
     type = models.CharField(max_length=32, choices=AGREEMENT_TYPES)
-    description = models.TextField()
+    description = models.TextField(blank=True, null=True)
 
     def __str__(self):
         return self.short_name
