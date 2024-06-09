@@ -1,4 +1,5 @@
 from pathlib import Path
+from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -111,7 +112,16 @@ USE_TZ = True
 
 REST_FRAMEWORK = {
     "DATE_INPUT_FORMATS": ["%d.%m.%Y", "%Y-%m-%d"],
-    "DATE_FORMAT": "%Y-%m-%d"
+    "DATE_FORMAT": "%Y-%m-%d",
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    )
+}
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=1),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+    "TOKEN_OBTAIN_SERIALIZER": "auth.serializers.CustomTokenObtainPairSerializer",
 }
 
 

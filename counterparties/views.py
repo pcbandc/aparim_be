@@ -1,8 +1,9 @@
 from rest_framework import generics, status
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from .models import Counterparty, Agreement, ContactPerson, Contact
-from .serializers import CounterpartySerializer, AgreementSerializer, ContactPersonSerializer, \
-    ContactSerializer
+from .serializers import CounterpartySerializer, AgreementSerializer, \
+    ContactPersonSerializer, ContactSerializer
 from django.http import HttpResponse
 
 
@@ -10,6 +11,7 @@ from django.http import HttpResponse
 class CounterpartyListAPIView(generics.ListCreateAPIView):
     queryset = Counterparty.objects.all()
     serializer_class = CounterpartySerializer
+    permission_classes = [IsAuthenticated]
 
 
 class CounterpartyDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
@@ -44,6 +46,18 @@ class CounterpartyDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
 class AgreementListAPIView(generics.ListCreateAPIView):
     queryset = Agreement.objects.all()
     serializer_class = AgreementSerializer
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, format=None):
+        serializer = self.serializer_class(data=request.data)
+        counterparty_name = request.data['counterparty']
+        counterparty = None
+        if counterparty_name:
+            counterparty = Counterparty.objects.get(short_name=counterparty_name)
+        if serializer.is_valid():
+            serializer.save(counterparty=counterparty)
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class AgreementDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
@@ -65,10 +79,12 @@ class AgreementDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
 
     def put(self, request, pk, format=None):
         agreement = Agreement.objects.get(public_id=pk)
-        if agreement:
+        counterparty_name = request.data['counterparty']
+        if agreement and counterparty_name:
             serializer = AgreementSerializer(agreement, data=request.data)
+            counterparty = Counterparty.objects.get(short_name=counterparty_name)
             if serializer.is_valid():
-                serializer.save()
+                serializer.save(counterparty=counterparty)
                 return Response(serializer.data)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
