@@ -34,7 +34,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'corsheaders',
     'import_export',
+    'mptt',
     'counterparties',
+    'stock'
 ]
 
 MIDDLEWARE = [

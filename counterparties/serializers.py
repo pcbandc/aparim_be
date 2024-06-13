@@ -42,3 +42,5 @@ class ContactSerializer(serializers.ModelSerializer):
         model = Contact
         fields = ['id', 'short_name', 'contact_person', 'type',
                   'value', 'notes']
+
+

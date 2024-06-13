@@ -27,3 +27,5 @@ class ContactAdmin(ImportExportModelAdmin):
     list_display = ('public_id', 'short_name', 'contact_person', 'type',
                     'value', 'notes')
 
+
+
