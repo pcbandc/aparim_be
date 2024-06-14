@@ -13,6 +13,8 @@ class WarehouseSerializer(serializers.ModelSerializer):
 
 class CategorySerializer(serializers.ModelSerializer):
     id = serializers.UUIDField(source='public_id', read_only=True, format='hex')
+    parent = serializers.UUIDField(source='parent.public_id', read_only=True,
+                                   format='hex')
 
     class Meta:
         model = Category
@@ -29,6 +31,10 @@ class UomSerializer(serializers.ModelSerializer):
 
 class GoodSerializer(serializers.ModelSerializer):
     id = serializers.UUIDField(source='public_id', read_only=True, format='hex')
+    category = serializers.UUIDField(source='category.public_id', read_only=True,
+                                     format='hex')
+    basic_uom = serializers.UUIDField(source='basic_uom.public_id', read_only=True,
+                                format='hex')
 
     class Meta:
         model = Good

@@ -1,10 +1,10 @@
+from django.http import HttpResponse
 from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from .models import Counterparty, Agreement, ContactPerson, Contact
 from .serializers import CounterpartySerializer, AgreementSerializer, \
     ContactPersonSerializer, ContactSerializer
-from django.http import HttpResponse
 
 
 # ***************************** Counterparty API view *************************************

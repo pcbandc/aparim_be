@@ -10,11 +10,11 @@ WAREHOUSE_TYPES = {
     'CT': 'Consignment'
 }
 VAT_RATES = {
-    '20%': 'Basic',
-    '7%': 'Reduced',
-    '0%': 'Export',
-    'w/VAT': 'VAT free',
-    'not VAT': 'Is not object for VAT'
+    '20%': '20%',
+    '7%': '7%',
+    '0%': '0%',
+    'w/VAT': 'без ПДВ',
+    'not VAT': 'не ПДВ'
 }
 GOOD_TRANSACTION_TYPE = {
     'RT': 'Receipt',
@@ -66,8 +66,8 @@ class Good(models.Model):
     public_id = models.UUIDField(db_index=True, unique=True, default=uuid.uuid4)
     short_name = models.CharField(max_length=50)
     full_name = models.CharField(max_length=200)
-    outer_id = models.CharField(max_length=50)
-    uktzed = models.CharField(max_length=50)
+    outer_id = models.CharField(max_length=50, blank=True, null=True)
+    uktzed = models.CharField(max_length=50, blank=True, null=True)
     basic_uom = models.ForeignKey(Uom, on_delete=models.CASCADE)
     vat_rate = models.CharField(max_length=12, choices=VAT_RATES)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
