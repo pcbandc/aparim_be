@@ -33,8 +33,8 @@ class GoodSerializer(serializers.ModelSerializer):
     id = serializers.UUIDField(source='public_id', read_only=True, format='hex')
     category = serializers.UUIDField(source='category.public_id', read_only=True,
                                      format='hex')
-    basic_uom = serializers.UUIDField(source='basic_uom.public_id', read_only=True,
-                                format='hex')
+    basic_uom = serializers.UUIDField(source='basic_uom.public_id',
+                                      read_only=True, format='hex')
 
     class Meta:
         model = Good
@@ -44,6 +44,10 @@ class GoodSerializer(serializers.ModelSerializer):
 
 class StockCardSerializer(serializers.ModelSerializer):
     id = serializers.UUIDField(source='public_id', read_only=True, format='hex')
+    good = serializers.UUIDField(source='good.public_id', read_only=True,
+                                 format='hex')
+    warehouse = serializers.UUIDField(source='warehouse.public_id',
+                                      read_only=True, format='hex')
 
     class Meta:
         model = StockCard
@@ -52,15 +56,25 @@ class StockCardSerializer(serializers.ModelSerializer):
 
 class GoodTransactionSerializer(serializers.ModelSerializer):
     id = serializers.UUIDField(source='public_id', read_only=True, format='hex')
+    good = serializers.UUIDField(source='good.public_id', read_only=True,
+                                 format='hex')
+    card = serializers.UUIDField(source='card.public_id', read_only=True,
+                                 format='hex')
+    document = serializers.UUIDField(source='document.public_id', read_only=True,
+                                     format='hex')
 
     class Meta:
         model = GoodTransaction
-        fields = ['id', 'card', 'time', 'document', 'transaction_type',
+        fields = ['id', 'good', 'card', 'time', 'document', 'transaction_type',
                   'quantity', 'cost']
 
 
 class DocumentSerializer(serializers.ModelSerializer):
     id = serializers.UUIDField(source='public_id', read_only=True, format='hex')
+    counterparty = serializers.UUIDField(source='counterparty.public_id',
+                                         read_only=True, format='hex')
+    agreement = serializers.UUIDField(source='agreement.public_id',
+                                      read_only=True, format='hex')
 
     class Meta:
         model = Document
@@ -69,7 +83,11 @@ class DocumentSerializer(serializers.ModelSerializer):
 
 class DocumentLineSerializer(serializers.ModelSerializer):
     id = serializers.UUIDField(source='public_id', read_only=True, format='hex')
+    good = serializers.UUIDField(source='good.public_id', read_only=True,
+                                 format='hex')
+    document = serializers.UUIDField(source='document.public_id', read_only=True,
+                                     format='hex')
 
     class Meta:
         model = DocumentLine
-        fields = ['id', 'good', 'quantity', 'price', 'vat_rate']
+        fields = ['id', 'good', 'document', 'quantity', 'price', 'vat_rate']

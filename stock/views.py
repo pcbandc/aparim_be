@@ -7,6 +7,7 @@ from .models import Warehouse, Category, Uom, Good, StockCard, Document, \
 from .serializers import WarehouseSerializer, CategorySerializer, UomSerializer, \
     GoodSerializer, StockCardSerializer, DocumentSerializer, GoodTransactionSerializer,\
     DocumentLineSerializer
+from counterparties.models import Counterparty, Agreement
 
 
 # ***************************** Warehouse API view *************************************
@@ -148,8 +149,8 @@ class GoodDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
         good = Good.objects.filter(public_id=pk)
         if good:
             good.delete()
-            return HttpResponse(f'The uom with id: {pk} has been deleted.')
-        return HttpResponse(f'The uom with id: {pk} does not exist in the database.')
+            return HttpResponse(f'The good with id: {pk} has been deleted.')
+        return HttpResponse(f'The good with id: {pk} does not exist in the database.')
 
     def get(self, request, pk, format=None):
         good = Good.objects.get(public_id=pk)
@@ -167,5 +168,205 @@ class GoodDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
                 category = Category.objects.get(public_id=category_public_id)
                 uom = Uom.objects.get(public_id=uom_public_id)
                 serializer.save(basic_uom=uom, category=category)
+                return Response(serializer.data)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+# ***************************** StockCard API view *************************************
+class StockCardListAPIView(generics.ListCreateAPIView):
+    queryset = StockCard.objects.all()
+    serializer_class = StockCardSerializer
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, format=None):
+        serializer = StockCardSerializer(data=request.data)
+        if serializer.is_valid():
+            warehouse_public_id = request.data['warehouse']
+            good_public_id = request.data['good']
+            warehouse = Warehouse.objects.get(public_id=warehouse_public_id)
+            good = Good.objects.get(public_id=good_public_id)
+            serializer.save(good=good, warehouse=warehouse)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class StockCardDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = StockCard.objects.all()
+    serializer_class = StockCardSerializer
+
+    def delete(self, request, pk, format=None):
+        stock_card = StockCard.objects.filter(public_id=pk)
+        if stock_card:
+            stock_card.delete()
+            return HttpResponse(f'The stock card with id: {pk} has been deleted.')
+        return HttpResponse(f'The stock card with id: {pk} does not exist in the database.')
+
+    def get(self, request, pk, format=None):
+        stock_card = StockCard.objects.get(public_id=pk)
+        if stock_card:
+            serializer = StockCardSerializer(stock_card)
+            return Response(serializer.data)
+
+    def put(self, request, pk, format=None):
+        stock_card = StockCard.objects.get(public_id=pk)
+        if stock_card:
+            serializer = StockCardSerializer(stock_card, data=request.data)
+            if serializer.is_valid():
+                warehouse_public_id = request.data['warehouse']
+                good_public_id = request.data['good']
+                warehouse = Warehouse.objects.get(public_id=warehouse_public_id)
+                good = Good.objects.get(public_id=good_public_id)
+                serializer.save(good=good, warehouse=warehouse)
+                return Response(serializer.data)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+# ***************************** Document API view *************************************
+class DocumentListAPIView(generics.ListCreateAPIView):
+    queryset = Document.objects.all()
+    serializer_class = DocumentSerializer
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, format=None):
+        serializer = DocumentSerializer(data=request.data)
+        if serializer.is_valid():
+            counterparty_public_id = request.data['counterparty']
+            agreement_public_id = request.data['agreement']
+            counterparty = Counterparty.objects.get(public_id=counterparty_public_id)
+            agreement = Agreement.objects.get(public_id=agreement_public_id)
+            serializer.save(counterparty=counterparty, agreement=agreement)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class DocumentDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Document.objects.all()
+    serializer_class = DocumentSerializer
+
+    def delete(self, request, pk, format=None):
+        document = Document.objects.filter(public_id=pk)
+        if document:
+            document.delete()
+            return HttpResponse(f'The document with id: {pk} has been deleted.')
+        return HttpResponse(f'The document with id: {pk} does not exist in the database.')
+
+    def get(self, request, pk, format=None):
+        document = Document.objects.get(public_id=pk)
+        if document:
+            serializer = DocumentSerializer(document)
+            return Response(serializer.data)
+
+    def put(self, request, pk, format=None):
+        document = Document.objects.get(public_id=pk)
+        if document:
+            serializer = DocumentSerializer(document, data=request.data)
+            if serializer.is_valid():
+                counterparty_public_id = request.data['counterparty']
+                agreement_public_id = request.data['agreement']
+                counterparty = Counterparty.objects.get(public_id=counterparty_public_id)
+                agreement = Agreement.objects.get(public_id=agreement_public_id)
+                serializer.save(counterparty=counterparty, agreement=agreement)
+                return Response(serializer.data)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+# ***************************** GoodTransaction API view *************************************
+class GoodTransactionListAPIView(generics.ListCreateAPIView):
+    queryset = GoodTransaction.objects.all()
+    serializer_class = GoodTransactionSerializer
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, format=None):
+        serializer = GoodTransactionSerializer(data=request.data)
+        if serializer.is_valid():
+            card_public_id = request.data['card']
+            document_public_id = request.data['document']
+            good_public_id = request.data['good']
+            card = StockCard.objects.get(public_id=card_public_id)
+            document = Document.objects.get(public_id=document_public_id)
+            good = Good.objects.get(public_id=good_public_id)
+            serializer.save(card=card, document=document, good=good)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class GoodTransactionDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = GoodTransaction.objects.all()
+    serializer_class = GoodTransactionSerializer
+
+    def delete(self, request, pk, format=None):
+        good_transaction = GoodTransaction.objects.filter(public_id=pk)
+        if good_transaction:
+            good_transaction.delete()
+            return HttpResponse(f'The good transaction with id: {pk} has been deleted.')
+        return HttpResponse(f'The good transaction with id: {pk} does not exist in the database.')
+
+    def get(self, request, pk, format=None):
+        good_transaction = GoodTransaction.objects.get(public_id=pk)
+        if good_transaction:
+            serializer = GoodTransactionSerializer(good_transaction)
+            return Response(serializer.data)
+
+    def put(self, request, pk, format=None):
+        good_transaction = GoodTransaction.objects.get(public_id=pk)
+        if good_transaction:
+            serializer = GoodTransactionSerializer(good_transaction, data=request.data)
+            if serializer.is_valid():
+                card_public_id = request.data['card']
+                document_public_id = request.data['document']
+                good_public_id = request.data['good']
+                card = StockCard.objects.get(public_id=card_public_id)
+                document = Document.objects.get(public_id=document_public_id)
+                good = Good.objects.get(public_id=good_public_id)
+                serializer.save(card=card, document=document, good=good)
+                return Response(serializer.data)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+# ***************************** DocumentLine API view *************************************
+class DocumentLineListAPIView(generics.ListCreateAPIView):
+    queryset = DocumentLine.objects.all()
+    serializer_class = DocumentLineSerializer
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, format=None):
+        serializer = DocumentLineSerializer(data=request.data)
+        if serializer.is_valid():
+            good_public_id = request.data['good']
+            document_public_id = request.data['document']
+            good = Good.objects.get(public_id=good_public_id)
+            document = Document.objects.get(public_id=document_public_id)
+            serializer.save(good=good, document=document)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class DocumentLineDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = DocumentLine.objects.all()
+    serializer_class = DocumentLineSerializer
+
+    def delete(self, request, pk, format=None):
+        document_line = DocumentLine.objects.get(public_id=pk)
+        if document_line:
+            document_line.delete()
+            return HttpResponse(f'The document line with id: {pk} has been deleted.')
+        return HttpResponse(f'The document line id: {pk} does not exist in the database.')
+
+    def get(self, request, pk, format=None):
+        document_line = DocumentLine.objects.get(public_id=pk)
+        if document_line:
+            serializer = DocumentLineSerializer(document_line)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    def put(self, request, pk, format=None):
+        document_line = DocumentLine.objects.get(public_id=pk)
+        if document_line:
+            serializer = DocumentLineSerializer(document_line, data=request.data)
+            if serializer.is_valid():
+                good_public_id = request.data['good']
+                document_public_id = request.data['document']
+                good = Good.objects.get(public_id=good_public_id)
+                document = Document.objects.get(public_id=document_public_id)
+                serializer.save(good=good, document=document)
                 return Response(serializer.data)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

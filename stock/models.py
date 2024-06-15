@@ -105,6 +105,7 @@ class Document(models.Model):
 
 class GoodTransaction(models.Model):
     public_id = models.UUIDField(db_index=True, unique=True, default=uuid.uuid4)
+    good = models.ForeignKey(Good, on_delete=models.CASCADE, related_name='goods')
     card = models.ForeignKey(StockCard, on_delete=models.CASCADE,
                              related_name='cards')
     time = models.DateTimeField()
@@ -122,7 +123,9 @@ class GoodTransaction(models.Model):
 class DocumentLine(models.Model):
     public_id = models.UUIDField(db_index=True, unique=True, default=uuid.uuid4)
     good = models.ForeignKey(Good, on_delete=models.CASCADE,
-                             related_name='goods')
+                             related_name='doc_goods')
+    document = models.ForeignKey(Document, on_delete=models.CASCADE,
+                                 related_name='doc_documents')
     quantity = models.DecimalField(max_digits=10, decimal_places=3)
     price = models.DecimalField(max_digits=10, decimal_places=2)
     vat_rate = models.CharField(max_length=12, choices=VAT_RATES)
