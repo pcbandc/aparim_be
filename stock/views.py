@@ -1,6 +1,8 @@
 from django.http import HttpResponse
+from django.db import transaction
 from rest_framework import generics, status
 from rest_framework.response import Response
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from .models import Warehouse, Category, Uom, Good, StockCard, Document, \
     GoodTransaction, DocumentLine
@@ -334,9 +336,11 @@ class DocumentLineListAPIView(generics.ListCreateAPIView):
         if serializer.is_valid():
             good_public_id = request.data['good']
             document_public_id = request.data['document']
+            warehouse_public_id = request.data['warehouse']
             good = Good.objects.get(public_id=good_public_id)
             document = Document.objects.get(public_id=document_public_id)
-            serializer.save(good=good, document=document)
+            warehouse = Warehouse.objects.get(public_id=warehouse_public_id)
+            serializer.save(good=good, document=document, warehouse=warehouse)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -365,8 +369,39 @@ class DocumentLineDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
             if serializer.is_valid():
                 good_public_id = request.data['good']
                 document_public_id = request.data['document']
+                warehouse_public_id = request.data['warehouse']
                 good = Good.objects.get(public_id=good_public_id)
                 document = Document.objects.get(public_id=document_public_id)
-                serializer.save(good=good, document=document)
+                warehouse = Warehouse.objects.get(public_id=warehouse_public_id)
+                serializer.save(good=good, document=document, warehouse=warehouse)
                 return Response(serializer.data)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+# ***************************** Post Document API view *************************************
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def post_vendors_invoice(request):
+    try:
+        document_id = request.data['document']
+        document = Document.objects.get(public_id=document_id)
+        if document:
+            if document.posted:
+                return HttpResponse(f'Document # {document.number} dd {document.time} '
+                                    f'has been already posted')
+            lines = document.lines.all().values()
+            with transaction.atomic():
+                for line in lines:
+                    good = Good.objects.get(id=line['good_id'])
+                    warehouse = Warehouse.objects.get(id=line['warehouse_id'])
+                    quantity = line['quantity']
+                    cost = line['price']
+                    StockCard.objects.create(good=good, warehouse=warehouse,
+                                             balance=quantity, cost=cost)
+                document.posted = True
+                document.save()
+            return HttpResponse(f'Document # {document.number} dd {document.time} has been '
+                                f'successfully posted')
+    except:
+        return HttpResponse("Something went wrong!")

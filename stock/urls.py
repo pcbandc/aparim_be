@@ -3,7 +3,8 @@ from .views import WarehouseListAPIView, WarehouseDetailAPIView, CategoryListAPI
     CategoryDetailAPIView, UomListAPIView, UomDetailAPIView, GoodListAPIView, \
     GoodDetailAPIView, StockCardListAPIView, StockCardDetailAPIView, \
     DocumentListAPIView, DocumentDetailAPIView, GoodTransactionListAPIView, \
-    GoodTransactionDetailAPIView, DocumentLineListAPIView, DocumentLineDetailAPIView
+    GoodTransactionDetailAPIView, DocumentLineListAPIView, DocumentLineDetailAPIView, \
+    post_vendors_invoice
 
 
 urlpatterns = [
@@ -23,4 +24,5 @@ urlpatterns = [
     path('good_transactions/<str:pk>/', GoodTransactionDetailAPIView.as_view()),
     path('document_lines/', DocumentLineListAPIView.as_view()),
     path('document_lines/<str:pk>/', DocumentLineDetailAPIView.as_view()),
+    path('vendors_invoice/post/', post_vendors_invoice),
 ]

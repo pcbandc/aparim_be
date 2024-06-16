@@ -51,7 +51,7 @@ class StockCardSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = StockCard
-        fields = ['id', 'good', 'warehouse', 'balance']
+        fields = ['id', 'good', 'warehouse', 'balance', 'cost']
 
 
 class GoodTransactionSerializer(serializers.ModelSerializer):
@@ -78,16 +78,20 @@ class DocumentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Document
-        fields = ['id', 'counterparty', 'agreement',  'type', 'time', 'number']
+        fields = ['id', 'counterparty', 'agreement',  'type', 'time', 'number',
+                  'posted']
 
 
 class DocumentLineSerializer(serializers.ModelSerializer):
     id = serializers.UUIDField(source='public_id', read_only=True, format='hex')
     good = serializers.UUIDField(source='good.public_id', read_only=True,
                                  format='hex')
+    warehouse = serializers.UUIDField(source='warehouse.public_id', read_only=True,
+                                      format='hex')
     document = serializers.UUIDField(source='document.public_id', read_only=True,
                                      format='hex')
 
     class Meta:
         model = DocumentLine
-        fields = ['id', 'good', 'document', 'quantity', 'price', 'vat_rate']
+        fields = ['id', 'good', 'warehouse', 'document', 'quantity', 'price',
+                  'vat_rate']

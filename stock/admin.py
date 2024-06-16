@@ -27,20 +27,21 @@ class GoodAdmin(ImportExportModelAdmin):
 
 @admin.register(StockCard)
 class StockCardAdmin(ImportExportModelAdmin):
-    list_display = ('public_id', 'good', 'warehouse', 'balance')
+    list_display = ('public_id', 'good', 'warehouse', 'balance', 'cost')
 
 
 @admin.register(GoodTransaction)
 class GoodTransactionAdmin(ImportExportModelAdmin):
-    list_display = ('public_id', 'good', 'card', 'time', 'document', 'transaction_type',
-                    'quantity', 'cost')
+    list_display = ('public_id', 'good', 'card', 'time', 'document',
+                    'transaction_type', 'quantity', 'cost')
 
 
 @admin.register(Document)
 class DocumentAdmin(ImportExportModelAdmin):
-    list_display = ('id', 'counterparty', 'agreement', 'time', 'number')
+    list_display = ('id', 'counterparty', 'agreement', 'time', 'number', 'posted')
 
 
 @admin.register(DocumentLine)
 class DocumentLineAdmin(ImportExportModelAdmin):
-    list_display = ('public_id', 'document', 'good', 'quantity',  'price', 'vat_rate')
+    list_display = ('public_id', 'document', 'good', 'quantity',  'price',
+                    'vat_rate')
