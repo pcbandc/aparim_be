@@ -426,9 +426,17 @@ def unpost_vendors_invoice(request):
                 return HttpResponse(f'Document # {document.number} dd {document.time} '
                                     f'is already unposted')
             with transaction.atomic():
-                lines = document.lines.all()
-                for line in lines:
-                    card = StockCard.objects.get()
+                transactions = GoodTransaction.objects.filter(document=document)
+                consumption_transactions = transactions.exclude(transaction_type='RT')
+                if len(consumption_transactions) > 0:
+                    return HttpResponse(f'Forbidden! There are following consumption transactions'
+                                        f'recorded on goods received under this document:')
+                cards_ids = []
+                for item in transactions:
+                    cards_ids.append(item.card.id)
+                cards = StockCard.objects.filter(id__in=cards_ids)
+                transactions.delete()
+                cards.delete()
                 document.posted = False
                 document.save()
             return HttpResponse(f'Document # {document.number} dd {document.time} has been '
