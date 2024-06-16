@@ -110,7 +110,6 @@ class GoodTransaction(models.Model):
     good = models.ForeignKey(Good, on_delete=models.CASCADE, related_name='goods')
     card = models.ForeignKey(StockCard, on_delete=models.CASCADE,
                              related_name='cards')
-    time = models.DateTimeField()
     document = models.ForeignKey(Document, on_delete=models.CASCADE,
                                  related_name='documents')
     transaction_type = models.CharField(max_length=12,

@@ -65,7 +65,7 @@ class GoodTransactionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = GoodTransaction
-        fields = ['id', 'good', 'card', 'time', 'document', 'transaction_type',
+        fields = ['id', 'good', 'card', 'document', 'transaction_type',
                   'quantity', 'cost']
 
 

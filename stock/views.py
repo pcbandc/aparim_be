@@ -378,7 +378,7 @@ class DocumentLineDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-# ***************************** Post Document API view *************************************
+# ***************************** Post Vendors Invoice API view *************************************
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -397,11 +397,41 @@ def post_vendors_invoice(request):
                     warehouse = Warehouse.objects.get(id=line['warehouse_id'])
                     quantity = line['quantity']
                     cost = line['price']
-                    StockCard.objects.create(good=good, warehouse=warehouse,
-                                             balance=quantity, cost=cost)
+                    card = StockCard.objects.create(good=good, warehouse=warehouse,
+                                                    balance=quantity, cost=cost)
+                    GoodTransaction.objects.create(good=good,
+                                                   card=card,
+                                                   document=document,
+                                                   transaction_type='RT',
+                                                   quantity=quantity,
+                                                   cost=cost)
                 document.posted = True
                 document.save()
             return HttpResponse(f'Document # {document.number} dd {document.time} has been '
                                 f'successfully posted')
+    except:
+        return HttpResponse("Something went wrong!")
+
+
+# ***************************** Unpost Vendors Invoice API view *************************************
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def unpost_vendors_invoice(request):
+    try:
+        document_id = request.data['document']
+        document = Document.objects.get(public_id=document_id)
+        if document:
+            if not document.posted:
+                return HttpResponse(f'Document # {document.number} dd {document.time} '
+                                    f'is already unposted')
+            with transaction.atomic():
+                lines = document.lines.all()
+                for line in lines:
+                    card = StockCard.objects.get()
+                document.posted = False
+                document.save()
+            return HttpResponse(f'Document # {document.number} dd {document.time} has been '
+                                f'successfully unposted')
     except:
         return HttpResponse("Something went wrong!")

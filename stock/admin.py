@@ -25,23 +25,40 @@ class GoodAdmin(ImportExportModelAdmin):
                     'uktzed', 'basic_uom', 'vat_rate', 'category', 'active')
 
 
+@admin.register(GoodTransaction)
+class GoodTransactionAdmin(ImportExportModelAdmin):
+    list_display = ('public_id', 'good', 'card', 'document', 'transaction_type',
+                    'quantity', 'cost')
+
+
+class GoodTransactionInline(admin.TabularInline):
+    model = GoodTransaction
+    extra = 0
+
+
 @admin.register(StockCard)
 class StockCardAdmin(ImportExportModelAdmin):
     list_display = ('public_id', 'good', 'warehouse', 'balance', 'cost')
-
-
-@admin.register(GoodTransaction)
-class GoodTransactionAdmin(ImportExportModelAdmin):
-    list_display = ('public_id', 'good', 'card', 'time', 'document',
-                    'transaction_type', 'quantity', 'cost')
-
-
-@admin.register(Document)
-class DocumentAdmin(ImportExportModelAdmin):
-    list_display = ('id', 'counterparty', 'agreement', 'time', 'number', 'posted')
+    inlines = [
+        GoodTransactionInline
+    ]
 
 
 @admin.register(DocumentLine)
 class DocumentLineAdmin(ImportExportModelAdmin):
     list_display = ('public_id', 'document', 'good', 'quantity',  'price',
                     'vat_rate')
+
+
+class DocumentLineInline(admin.TabularInline):
+    model = DocumentLine
+    extra = 0
+
+
+@admin.register(Document)
+class DocumentAdmin(ImportExportModelAdmin):
+    list_display = ('id', 'counterparty', 'agreement', 'time', 'number', 'posted')
+    inlines = [
+        DocumentLineInline
+    ]
+    
