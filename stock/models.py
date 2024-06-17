@@ -1,6 +1,7 @@
+import uuid
+from datetime import datetime
 from django.db import models
 from mptt.models import MPTTModel, TreeForeignKey
-import uuid
 from counterparties.models import Counterparty, Agreement
 
 WAREHOUSE_TYPES = {
@@ -79,6 +80,7 @@ class Good(models.Model):
 
 class StockCard(models.Model):
     public_id = models.UUIDField(db_index=True, unique=True, default=uuid.uuid4)
+    time = models.DateTimeField(default=datetime.now())
     good = models.ForeignKey(Good, on_delete=models.CASCADE,
                              related_name='transactions')
     warehouse = models.ForeignKey(Warehouse, on_delete=models.CASCADE,
@@ -105,22 +107,6 @@ class Document(models.Model):
         return f'{self.number} dd {self.time}'
 
 
-class GoodTransaction(models.Model):
-    public_id = models.UUIDField(db_index=True, unique=True, default=uuid.uuid4)
-    good = models.ForeignKey(Good, on_delete=models.CASCADE, related_name='goods')
-    card = models.ForeignKey(StockCard, on_delete=models.CASCADE,
-                             related_name='cards')
-    document = models.ForeignKey(Document, on_delete=models.CASCADE,
-                                 related_name='documents')
-    transaction_type = models.CharField(max_length=12,
-                                        choices=GOOD_TRANSACTION_TYPE)
-    quantity = models.DecimalField(max_digits=10, decimal_places=3)
-    cost = models.DecimalField(max_digits=10, decimal_places=2)
-
-    def __str__(self):
-        return f'{self.document}'
-
-
 class DocumentLine(models.Model):
     public_id = models.UUIDField(db_index=True, unique=True, default=uuid.uuid4)
     good = models.ForeignKey(Good, on_delete=models.CASCADE,
@@ -135,3 +121,19 @@ class DocumentLine(models.Model):
 
     def __str__(self):
         return f'{self.document} - {self.good}'
+
+
+class GoodTransaction(models.Model):
+    public_id = models.UUIDField(db_index=True, unique=True, default=uuid.uuid4)
+    good = models.ForeignKey(Good, on_delete=models.CASCADE, related_name='goods')
+    card = models.ForeignKey(StockCard, on_delete=models.CASCADE,
+                             related_name='cards')
+    document = models.ForeignKey(Document, on_delete=models.CASCADE,
+                                 related_name='documents')
+    transaction_type = models.CharField(max_length=12,
+                                        choices=GOOD_TRANSACTION_TYPE)
+    quantity = models.DecimalField(max_digits=10, decimal_places=3)
+    cost = models.DecimalField(max_digits=10, decimal_places=2)
+
+    def __str__(self):
+        return f'{self.document}'

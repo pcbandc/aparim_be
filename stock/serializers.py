@@ -51,7 +51,7 @@ class StockCardSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = StockCard
-        fields = ['id', 'good', 'warehouse', 'balance', 'cost']
+        fields = ['id', 'time', 'good', 'warehouse', 'balance', 'cost']
 
 
 class GoodTransactionSerializer(serializers.ModelSerializer):

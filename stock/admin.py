@@ -38,7 +38,7 @@ class GoodTransactionInline(admin.TabularInline):
 
 @admin.register(StockCard)
 class StockCardAdmin(ImportExportModelAdmin):
-    list_display = ('public_id', 'good', 'warehouse', 'balance', 'cost')
+    list_display = ('public_id', 'time', 'good', 'warehouse', 'balance', 'cost')
     inlines = [
         GoodTransactionInline
     ]
@@ -57,7 +57,7 @@ class DocumentLineInline(admin.TabularInline):
 
 @admin.register(Document)
 class DocumentAdmin(ImportExportModelAdmin):
-    list_display = ('id', 'counterparty', 'agreement', 'time', 'number', 'posted')
+    list_display = ('type', 'counterparty', 'agreement', 'time', 'number', 'posted')
     inlines = [
         DocumentLineInline
     ]
