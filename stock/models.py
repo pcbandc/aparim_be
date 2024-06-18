@@ -82,9 +82,9 @@ class StockCard(models.Model):
     public_id = models.UUIDField(db_index=True, unique=True, default=uuid.uuid4)
     time = models.DateTimeField(default=datetime.now())
     good = models.ForeignKey(Good, on_delete=models.CASCADE,
-                             related_name='transactions')
+                             related_name='cards')
     warehouse = models.ForeignKey(Warehouse, on_delete=models.CASCADE,
-                                  related_name='warehouses')
+                                  related_name='cards')
     balance = models.DecimalField(max_digits=10, decimal_places=3, default=0)
     cost = models.DecimalField(max_digits=10, decimal_places=2, default=0)
 
@@ -125,11 +125,11 @@ class DocumentLine(models.Model):
 
 class GoodTransaction(models.Model):
     public_id = models.UUIDField(db_index=True, unique=True, default=uuid.uuid4)
-    good = models.ForeignKey(Good, on_delete=models.CASCADE, related_name='goods')
+    good = models.ForeignKey(Good, on_delete=models.CASCADE, related_name='transactions')
     card = models.ForeignKey(StockCard, on_delete=models.CASCADE,
-                             related_name='cards')
+                             related_name='transactions')
     document = models.ForeignKey(Document, on_delete=models.CASCADE,
-                                 related_name='documents')
+                                 related_name='transactions')
     transaction_type = models.CharField(max_length=12,
                                         choices=GOOD_TRANSACTION_TYPE)
     quantity = models.DecimalField(max_digits=10, decimal_places=3)

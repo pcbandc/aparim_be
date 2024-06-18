@@ -479,3 +479,32 @@ def post_customers_invoice(request):
     except:
         return HttpResponse("Something went wrong!")
 
+
+# ***************************** Unpost Customers Invoice API view *************************************
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def unpost_customers_invoice(request):
+    try:
+        document_id = request.data['document']
+        document = Document.objects.get(public_id=document_id)
+        if document:
+            if document.type != 'SI':
+                return HttpResponse(f'Document # {document.number} dd {document.time} '
+                                    f'is not purchase invoice')
+            if not document.posted:
+                return HttpResponse(f'Document # {document.number} dd {document.time} '
+                                    f'is already unposted')
+            with transaction.atomic():
+                good_transactions = GoodTransaction.objects.filter(document=document)
+                for good_transaction in good_transactions:
+                    card = good_transaction.card
+                    card.balance += good_transaction.quantity
+                    card.save()
+                    good_transaction.delete()
+                document.posted = False
+                document.save()
+                return HttpResponse(f'Document # {document.number} dd {document.time} has been '
+                                    f'successfully unposted')
+    except:
+        return HttpResponse("Something went wrong!")
