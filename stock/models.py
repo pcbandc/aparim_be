@@ -19,7 +19,7 @@ VAT_RATES = {
 }
 GOOD_TRANSACTION_TYPE = {
     'RT': 'Receipt',
-    'IS': 'Issue',
+    'DH': 'Dispatch',
     'CN': 'Credit note',
     'DN': 'Debit note',
     'WO': 'Write off',

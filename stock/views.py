@@ -469,9 +469,9 @@ def post_customers_invoice(request):
             lines = document.lines.all()
             with transaction.atomic():
                 for line in lines:
-                    fifo(line.good, line.warehouse, line.quantity, document.time)
-                # document.posted = True
-                # document.save()
+                    fifo(line.good, line.warehouse, line.quantity, document)
+                document.posted = True
+                document.save()
             return HttpResponse(f'Document # {document.number} dd {document.time} has been '
                                 f'successfully posted')
     except NotEnoughStock as e:

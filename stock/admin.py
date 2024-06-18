@@ -38,7 +38,7 @@ class GoodTransactionInline(admin.TabularInline):
 
 @admin.register(StockCard)
 class StockCardAdmin(ImportExportModelAdmin):
-    list_display = ('public_id', 'time', 'good', 'warehouse', 'balance', 'cost')
+    list_display = ('id', 'time', 'good', 'warehouse', 'balance', 'cost')
     inlines = [
         GoodTransactionInline
     ]
