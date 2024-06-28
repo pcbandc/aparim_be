@@ -14,14 +14,13 @@ class CounterpartySerializer(serializers.ModelSerializer):
 
 class AgreementSerializer(serializers.ModelSerializer):
     id = serializers.UUIDField(source='public_id', read_only=True, format='hex')
-    # counterparty = serializers.UUIDField(source='counterparty.public_id',
-    #                                      format='hex', read_only=True)
+    shortName = serializers.CharField(source='short_name')
     counterparty = serializers.CharField(source='counterparty.short_name',
                                          read_only=True)
 
     class Meta:
         model = Agreement
-        fields = ['id', 'short_name', 'number', 'commencement_date',
+        fields = ['id', 'shortName', 'number', 'commencement_date',
                   'expiration_date', 'payment_delay_days', 'total_value',
                   'counterparty', 'type', 'description']
 

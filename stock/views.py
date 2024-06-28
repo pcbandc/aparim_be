@@ -233,10 +233,11 @@ class DocumentListAPIView(generics.ListCreateAPIView):
     def post(self, request, format=None):
         serializer = DocumentSerializer(data=request.data)
         if serializer.is_valid():
-            counterparty_public_id = request.data['counterparty']
-            agreement_public_id = request.data['agreement']
+            counterparty_public_id = request.data['counterparty_id']
+            agreement_public_id = request.data['agreement_id']
             counterparty = Counterparty.objects.get(public_id=counterparty_public_id)
             agreement = Agreement.objects.get(public_id=agreement_public_id)
+            print(agreement)
             serializer.save(counterparty=counterparty, agreement=agreement)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -264,9 +265,9 @@ class DocumentDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
         if document:
             serializer = DocumentSerializer(document, data=request.data)
             if serializer.is_valid():
-                counterparty_public_id = request.data['counterparty']
-                agreement_public_id = request.data['agreement']
-                counterparty = Counterparty.objects.get(public_id=counterparty_public_id)
+                counterparty_id = request.data['counterparty_id']
+                agreement_public_id = request.data['agreement_id']
+                counterparty = Counterparty.objects.get(public_id=counterparty_id)
                 agreement = Agreement.objects.get(public_id=agreement_public_id)
                 serializer.save(counterparty=counterparty, agreement=agreement)
                 return Response(serializer.data)

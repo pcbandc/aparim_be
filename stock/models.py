@@ -101,7 +101,7 @@ class Document(models.Model):
     type = models.CharField(choices=DOCUMENT_TYPE, max_length=12)
     time = models.DateTimeField()
     number = models.CharField(max_length=50)
-    posted = models.BooleanField(default=False)
+    posted = models.BooleanField(default=False, blank=True)
 
     def __str__(self):
         return f'{self.number} dd {self.time}'
