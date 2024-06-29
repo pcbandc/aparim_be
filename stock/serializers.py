@@ -5,26 +5,27 @@ from .models import Warehouse, Category, Uom, Good, GoodTransaction, StockCard, 
 
 class WarehouseSerializer(serializers.ModelSerializer):
     id = serializers.UUIDField(source='public_id', read_only=True, format='hex')
+    shortName = serializers.CharField(source='name')
 
     class Meta:
         model = Warehouse
-        fields = ['id', 'name', 'type', 'active', 'address']
+        fields = ['id', 'shortName', 'type', 'active', 'address']
 
 
 class CategorySerializer(serializers.ModelSerializer):
     id = serializers.UUIDField(source='public_id', read_only=True, format='hex')
-    parent = serializers.UUIDField(source='parent.public_id', read_only=True,
-                                   format='hex')
+    shortName = serializers.CharField(source="name")
+    parent = serializers.CharField(source='parent.name', read_only=True)
 
     class Meta:
         model = Category
-        fields = ['id', 'name', 'parent']
+        fields = ['id', 'shortName', 'parent']
 
 
 class UomSerializer(serializers.ModelSerializer):
     id = serializers.UUIDField(source='public_id', read_only=True, format='hex')
-    shortName = serializers.CharField(source='short_name', read_only=True)
-    fullName = serializers.CharField(source='full_name', read_only=True)
+    shortName = serializers.CharField(source='short_name')
+    fullName = serializers.CharField(source='full_name')
 
     class Meta:
         model = Uom
