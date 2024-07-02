@@ -36,6 +36,7 @@ class GoodSerializer(serializers.ModelSerializer):
     id = serializers.UUIDField(source='public_id',
                                read_only=True,
                                format='hex')
+    shortName = serializers.CharField(source='short_name')
     category = serializers.CharField(source='category.name',
                                      read_only=True)
     category_id = serializers.UUIDField(source='category.public_id',
@@ -50,7 +51,7 @@ class GoodSerializer(serializers.ModelSerializer):
     class Meta:
         model = Good
         fields = ['id', 'outer_id', 'uktzed', 'basic_uom', 'basic_uom_id',
-                  'vat_rate', 'short_name', 'full_name', 'category',
+                  'vat_rate', 'shortName', 'full_name', 'category',
                   'category_id', 'active']
 
 

@@ -135,8 +135,8 @@ class GoodListAPIView(generics.ListCreateAPIView):
     def post(self, request, format=None):
         serializer = GoodSerializer(data=request.data)
         if serializer.is_valid():
-            category_public_id = request.data['category']
-            uom_public_id = request.data['basic_uom']
+            category_public_id = request.data['category_id']
+            uom_public_id = request.data['basic_uom_id']
             category = Category.objects.get(public_id=category_public_id)
             uom = Uom.objects.get(public_id=uom_public_id)
             serializer.save(basic_uom=uom, category=category)
@@ -165,8 +165,8 @@ class GoodDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
         good = Good.objects.get(public_id=pk)
         if good:
             serializer = GoodSerializer(good, data=request.data)
-            uom_public_id = request.data['basic_uom']
-            category_public_id = request.data['category']
+            uom_public_id = request.data['basic_uom_id']
+            category_public_id = request.data['category_id']
             if serializer.is_valid():
                 category = Category.objects.get(public_id=category_public_id)
                 uom = Uom.objects.get(public_id=uom_public_id)
