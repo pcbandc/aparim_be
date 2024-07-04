@@ -333,6 +333,12 @@ class DocumentLineListAPIView(generics.ListCreateAPIView):
     serializer_class = DocumentLineSerializer
     permission_classes = [IsAuthenticated]
 
+    def get_queryset(self):
+        document_id = self.request.query_params.get('document_id')
+        if document_id:
+            return DocumentLine.objects.filter(document__public_id=document_id)
+        return HttpResponse('There is no such document!')
+
     def post(self, request, format=None):
         serializer = DocumentLineSerializer(data=request.data)
         if serializer.is_valid():
