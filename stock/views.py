@@ -280,6 +280,12 @@ class GoodTransactionListAPIView(generics.ListCreateAPIView):
     serializer_class = GoodTransactionSerializer
     permission_classes = [IsAuthenticated]
 
+    def get_queryset(self):
+        document_id = self.request.query_params.get('document_id')
+        if document_id:
+            return GoodTransaction.objects.filter(document__public_id=document_id)
+        return HttpResponse('There is no such document!')
+
     def post(self, request, format=None):
         serializer = GoodTransactionSerializer(data=request.data)
         if serializer.is_valid():
@@ -342,9 +348,9 @@ class DocumentLineListAPIView(generics.ListCreateAPIView):
     def post(self, request, format=None):
         serializer = DocumentLineSerializer(data=request.data)
         if serializer.is_valid():
-            good_public_id = request.data['good']
+            good_public_id = request.data['good_id']
             document_public_id = request.data['document']
-            warehouse_public_id = request.data['warehouse']
+            warehouse_public_id = request.data['warehouse_id']
             good = Good.objects.get(public_id=good_public_id)
             document = Document.objects.get(public_id=document_public_id)
             warehouse = Warehouse.objects.get(public_id=warehouse_public_id)
@@ -375,9 +381,9 @@ class DocumentLineDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
         if document_line:
             serializer = DocumentLineSerializer(document_line, data=request.data)
             if serializer.is_valid():
-                good_public_id = request.data['good']
+                good_public_id = request.data['good_id']
                 document_public_id = request.data['document']
-                warehouse_public_id = request.data['warehouse']
+                warehouse_public_id = request.data['warehouse_id']
                 good = Good.objects.get(public_id=good_public_id)
                 document = Document.objects.get(public_id=document_public_id)
                 warehouse = Warehouse.objects.get(public_id=warehouse_public_id)
