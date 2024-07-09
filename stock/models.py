@@ -124,12 +124,16 @@ class DocumentLine(models.Model):
 
 
 class GoodTransaction(models.Model):
-    public_id = models.UUIDField(db_index=True, unique=True, default=uuid.uuid4)
-    good = models.ForeignKey(Good, on_delete=models.CASCADE, related_name='transactions')
+    public_id = models.UUIDField(db_index=True, unique=True,
+                                 default=uuid.uuid4)
+    good = models.ForeignKey(Good, on_delete=models.CASCADE,
+                             related_name='transactions')
     card = models.ForeignKey(StockCard, on_delete=models.CASCADE,
                              related_name='transactions')
     document = models.ForeignKey(Document, on_delete=models.CASCADE,
                                  related_name='transactions')
+    document_line = models.ForeignKey(DocumentLine, on_delete=models.CASCADE,
+                                      related_name='transactions')
     transaction_type = models.CharField(max_length=12,
                                         choices=GOOD_TRANSACTION_TYPE)
     quantity = models.DecimalField(max_digits=10, decimal_places=3)

@@ -292,10 +292,12 @@ class GoodTransactionListAPIView(generics.ListCreateAPIView):
             card_public_id = request.data['card']
             document_public_id = request.data['document']
             good_public_id = request.data['good']
+            document_line_id = request.data['document_line']
             card = StockCard.objects.get(public_id=card_public_id)
             document = Document.objects.get(public_id=document_public_id)
             good = Good.objects.get(public_id=good_public_id)
-            serializer.save(card=card, document=document, good=good)
+            document_line = DocumentLine.objects.get(public_id=document_line_id)
+            serializer.save(card=card, document=document, good=good, document_line=document_line)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -325,10 +327,12 @@ class GoodTransactionDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
                 card_public_id = request.data['card']
                 document_public_id = request.data['document']
                 good_public_id = request.data['good']
+                document_line_id = request.data['document_line']
                 card = StockCard.objects.get(public_id=card_public_id)
                 document = Document.objects.get(public_id=document_public_id)
                 good = Good.objects.get(public_id=good_public_id)
-                serializer.save(card=card, document=document, good=good)
+                document_line = DocumentLine.objects.get(public_id=document_line_id)
+                serializer.save(card=card, document=document, good=good, document_line=document_line)
                 return Response(serializer.data)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -418,6 +422,7 @@ def post_vendors_invoice(request):
                     GoodTransaction.objects.create(good=line.good,
                                                    card=card,
                                                    document=document,
+                                                   document_line=line,
                                                    transaction_type='RT',
                                                    quantity=line.quantity,
                                                    cost=line.price)
@@ -445,7 +450,7 @@ def unpost_vendors_invoice(request):
                 return HttpResponse(f'Document # {document.number} dd {document.time} '
                                     f'is already unposted')
             with transaction.atomic():
-                transactions = GoodTransaction.objects.filter(document=document)
+                transactions = GoodTransaction.objects.all()
                 consumption_transactions = transactions.exclude(transaction_type='RT')
                 if len(consumption_transactions) > 0:
                     return HttpResponse(f'Forbidden! There are following consumption transactions'
@@ -482,7 +487,7 @@ def post_customers_invoice(request):
             lines = document.lines.all()
             with transaction.atomic():
                 for line in lines:
-                    fifo(line.good, line.warehouse, line.quantity, document)
+                    fifo(line.good, line.warehouse, line.quantity, document, line)
                 document.posted = True
                 document.save()
             return HttpResponse(f'Document # {document.number} dd {document.time} has been '

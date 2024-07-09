@@ -75,11 +75,13 @@ class GoodTransactionSerializer(serializers.ModelSerializer):
                                  format='hex')
     document = serializers.UUIDField(source='document.public_id', read_only=True,
                                      format='hex')
+    document_line = serializers.UUIDField(source='document_line.public_id',
+                                          read_only=True, format='hex')
 
     class Meta:
         model = GoodTransaction
-        fields = ['id', 'good', 'card', 'document', 'transaction_type',
-                  'quantity', 'cost']
+        fields = ['id', 'good', 'card', 'document', 'document_line',
+                  'transaction_type', 'quantity', 'cost']
 
 
 class DocumentSerializer(serializers.ModelSerializer):

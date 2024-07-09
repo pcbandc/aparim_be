@@ -27,8 +27,8 @@ class GoodAdmin(ImportExportModelAdmin):
 
 @admin.register(GoodTransaction)
 class GoodTransactionAdmin(ImportExportModelAdmin):
-    list_display = ('public_id', 'good', 'card', 'document', 'transaction_type',
-                    'quantity', 'cost')
+    list_display = ('public_id', 'good', 'card', 'document', 'document_line',
+                    'transaction_type', 'quantity', 'cost')
 
 
 class GoodTransactionInline(admin.TabularInline):

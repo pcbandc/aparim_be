@@ -14,7 +14,7 @@ def check_availability(good, warehouse, quantity, time):
     return balance - quantity
 
 
-def fifo(good, warehouse, quantity, document):
+def fifo(good, warehouse, quantity, document, line):
     left_to_dispatch = quantity
     cards = StockCard.objects.filter(
         good=good,
@@ -44,6 +44,7 @@ def fifo(good, warehouse, quantity, document):
                 good=good,
                 card=card,
                 document=document,
+                line=line,
                 transaction_type='DH',
                 quantity=card.balance,
                 cost=card.cost
