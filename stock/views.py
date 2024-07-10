@@ -13,6 +13,7 @@ from counterparties.models import Counterparty, Agreement
 from .services import check_availability, fifo
 from .exceptions import NotEnoughStock
 
+
 # ***************************** Warehouse API view *************************************
 class WarehouseListAPIView(generics.ListCreateAPIView):
     queryset = Warehouse.objects.all()
@@ -281,10 +282,12 @@ class GoodTransactionListAPIView(generics.ListCreateAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        document_id = self.request.query_params.get('document_id')
-        if document_id:
-            return GoodTransaction.objects.filter(document__public_id=document_id)
-        return HttpResponse('There is no such document!')
+        try:
+            document_id = self.request.query_params.get('document_id')
+            if document_id:
+                return GoodTransaction.objects.filter(document__public_id=document_id)
+        except:
+            return HttpResponse('There is no such document!')
 
     def post(self, request, format=None):
         serializer = GoodTransactionSerializer(data=request.data)
@@ -307,10 +310,11 @@ class GoodTransactionDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = GoodTransactionSerializer
 
     def delete(self, request, pk, format=None):
-        good_transaction = GoodTransaction.objects.filter(public_id=pk)
-        if good_transaction:
-            good_transaction.delete()
-            return HttpResponse(f'The good transaction with id: {pk} has been deleted.')
+        if pk:
+            good_transaction = GoodTransaction.objects.filter(public_id=pk)
+            if good_transaction:
+                good_transaction.delete()
+                return HttpResponse(f'The good transaction with id: {pk} has been deleted.')
         return HttpResponse(f'The good transaction with id: {pk} does not exist in the database.')
 
     def get(self, request, pk, format=None):
@@ -344,10 +348,12 @@ class DocumentLineListAPIView(generics.ListCreateAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        document_id = self.request.query_params.get('document_id')
-        if document_id:
-            return DocumentLine.objects.filter(document__public_id=document_id)
-        return HttpResponse('There is no such document!')
+        try:
+            document_id = self.request.query_params.get('document_id')
+            if document_id:
+                return DocumentLine.objects.filter(document__public_id=document_id)
+        except:
+            return HttpResponse('There is no such document!')
 
     def post(self, request, format=None):
         serializer = DocumentLineSerializer(data=request.data)
