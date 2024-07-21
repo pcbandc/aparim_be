@@ -456,7 +456,7 @@ def unpost_vendors_invoice(request):
                 return HttpResponse(f'Document # {document.number} dd {document.time} '
                                     f'is already unposted')
             with transaction.atomic():
-                transactions = GoodTransaction.objects.all()
+                transactions = GoodTransaction.objects.filter(document=document)
                 consumption_transactions = transactions.exclude(transaction_type='RT')
                 if len(consumption_transactions) > 0:
                     return HttpResponse(f'Forbidden! There are following consumption transactions'

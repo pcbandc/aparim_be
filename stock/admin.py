@@ -55,10 +55,16 @@ class DocumentLineInline(admin.TabularInline):
     extra = 0
 
 
+class GoodTransactionInline(admin.TabularInline):
+    model = GoodTransaction
+    extra = 0
+
+
 @admin.register(Document)
 class DocumentAdmin(ImportExportModelAdmin):
     list_display = ('type', 'counterparty', 'agreement', 'time', 'number', 'posted')
     inlines = [
-        DocumentLineInline
+        DocumentLineInline,
+        GoodTransactionInline
     ]
     
