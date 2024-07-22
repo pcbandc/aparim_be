@@ -10,7 +10,7 @@ from .serializers import WarehouseSerializer, CategorySerializer, UomSerializer,
     GoodSerializer, StockCardSerializer, DocumentSerializer, GoodTransactionSerializer,\
     DocumentLineSerializer
 from counterparties.models import Counterparty, Agreement
-from .services import check_availability, fifo
+from .services import check_availability, fifo, post_invoice, unpost_invoice
 from .exceptions import NotEnoughStock
 
 
@@ -404,131 +404,142 @@ class DocumentLineDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
 
 # ***************************** Post Vendors Invoice API view *************************************
 
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
-def post_vendors_invoice(request):
-    try:
-        document_id = request.data['document']
-        document = Document.objects.get(public_id=document_id)
-        if document:
-            if document.type != 'PI':
-                return HttpResponse(f'Document # {document.number} dd {document.time} '
-                                    f'is not purchase invoice')
-            if document.posted:
-                return HttpResponse(f'Document # {document.number} dd {document.time} '
-                                    f'has been already posted')
-            lines = document.lines.all()
-            with transaction.atomic():
-                for line in lines:
-                    card = StockCard.objects.create(good=line.good,
-                                                    time=document.time,
-                                                    warehouse=line.warehouse,
-                                                    balance=line.quantity,
-                                                    cost=line.price)
-                    GoodTransaction.objects.create(good=line.good,
-                                                   card=card,
-                                                   document=document,
-                                                   document_line=line,
-                                                   transaction_type='RT',
-                                                   quantity=line.quantity,
-                                                   cost=line.price)
-                document.posted = True
-                document.save()
-            return HttpResponse(f'Document # {document.number} dd {document.time} has been '
-                                f'successfully posted')
-    except:
-        return HttpResponse("Something went wrong!")
+# @api_view(['POST'])
+# @permission_classes([IsAuthenticated])
+# def post_vendors_invoice(request):
+#     try:
+#         document_id = request.data['document']
+#         document = Document.objects.get(public_id=document_id)
+#         if document:
+#             if document.type != 'PI':
+#                 return HttpResponse(f'Document # {document.number} dd {document.time} '
+#                                     f'is not purchase invoice')
+#             if document.posted:
+#                 return HttpResponse(f'Document # {document.number} dd {document.time} '
+#                                     f'has been already posted')
+#             lines = document.lines.all()
+#             with transaction.atomic():
+#                 for line in lines:
+#                     card = StockCard.objects.create(good=line.good,
+#                                                     time=document.time,
+#                                                     warehouse=line.warehouse,
+#                                                     balance=line.quantity,
+#                                                     cost=line.price)
+#                     GoodTransaction.objects.create(good=line.good,
+#                                                    card=card,
+#                                                    document=document,
+#                                                    document_line=line,
+#                                                    transaction_type='RT',
+#                                                    quantity=line.quantity,
+#                                                    cost=line.price)
+#                 document.posted = True
+#                 document.save()
+#             return HttpResponse(f'Document # {document.number} dd {document.time} has been '
+#                                 f'successfully posted')
+#     except:
+#         return HttpResponse("Something went wrong!")
 
 
 # ***************************** Unpost Vendors Invoice API view *************************************
 
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
-def unpost_vendors_invoice(request):
-    try:
-        document_id = request.data['document']
-        document = Document.objects.get(public_id=document_id)
-        if document:
-            if document.type != 'PI':
-                return HttpResponse(f'Document # {document.number} dd {document.time} '
-                                    f'is not purchase invoice')
-            if not document.posted:
-                return HttpResponse(f'Document # {document.number} dd {document.time} '
-                                    f'is already unposted')
-            with transaction.atomic():
-                transactions = GoodTransaction.objects.filter(document=document)
-                consumption_transactions = transactions.exclude(transaction_type='RT')
-                if len(consumption_transactions) > 0:
-                    return HttpResponse(f'Forbidden! There are following consumption transactions'
-                                        f'recorded on goods received under this document:')
-                cards_ids = []
-                for item in transactions:
-                    cards_ids.append(item.card.id)
-                cards = StockCard.objects.filter(id__in=cards_ids)
-                transactions.delete()
-                cards.delete()
-                document.posted = False
-                document.save()
-            return HttpResponse(f'Document # {document.number} dd {document.time} has been '
-                                f'successfully unposted')
-    except:
-        return HttpResponse("Something went wrong!")
+# @api_view(['POST'])
+# @permission_classes([IsAuthenticated])
+# def unpost_vendors_invoice(request):
+#     try:
+#         document_id = request.data['document']
+#         document = Document.objects.get(public_id=document_id)
+#         if document:
+#             if document.type != 'PI':
+#                 return HttpResponse(f'Document # {document.number} dd {document.time} '
+#                                     f'is not purchase invoice')
+#             if not document.posted:
+#                 return HttpResponse(f'Document # {document.number} dd {document.time} '
+#                                     f'is already unposted')
+#             with transaction.atomic():
+#                 document_transactions = GoodTransaction.objects.filter(document=document)
+#                 cards_ids = document_transactions.values_list("card", flat=True)
+#                 cards = StockCard.objects.filter(id__in=cards_ids)
+#                 cards_transactions = GoodTransaction.objects.filter(card__in=cards_ids)
+#                 cards_consumption_transactions = cards_transactions.exclude(transaction_type='RT')
+#                 if len(cards_consumption_transactions) > 0:
+#                     return HttpResponse(f'Forbidden! There are following consumption transactions'
+#                                         f'recorded on goods received under this document:')
+#                 document_transactions.delete()
+#                 cards.delete()
+#                 document.posted = False
+#                 document.save()
+#             return HttpResponse(f'Document # {document.number} dd {document.time} has been '
+#                                 f'successfully unposted')
+#     except:
+#         return HttpResponse("Something went wrong!")
 
 
 # ***************************** Post Customers Invoice API view *************************************
 
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
-def post_customers_invoice(request):
-    try:
-        document_id = request.data['document']
-        document = Document.objects.get(public_id=document_id)
-        if document:
-            if document.type != 'SI':
-                return HttpResponse(f'Document # {document.number} dd {document.time} '
-                                    f'is not sales invoice')
-            if document.posted:
-                return HttpResponse(f'Document # {document.number} dd {document.time} '
-                                    f'has been already posted')
-            lines = document.lines.all()
-            with transaction.atomic():
-                for line in lines:
-                    fifo(line.good, line.warehouse, line.quantity, document, line)
-                document.posted = True
-                document.save()
-            return HttpResponse(f'Document # {document.number} dd {document.time} has been '
-                                f'successfully posted')
-    except NotEnoughStock as e:
-        return HttpResponse(repr(e))
-    except:
-        return HttpResponse("Something went wrong!")
+# @api_view(['POST'])
+# @permission_classes([IsAuthenticated])
+# def post_customers_invoice(request):
+#     try:
+#         document_id = request.data['document']
+#         document = Document.objects.get(public_id=document_id)
+#         if document:
+#             if document.type != 'SI':
+#                 return HttpResponse(f'Document # {document.number} dd {document.time} '
+#                                     f'is not sales invoice')
+#             if document.posted:
+#                 return HttpResponse(f'Document # {document.number} dd {document.time} '
+#                                     f'has been already posted')
+#             lines = document.lines.all()
+#             with transaction.atomic():
+#                 for line in lines:
+#                     fifo(line.good, line.warehouse, line.quantity, document, line)
+#                 document.posted = True
+#                 document.save()
+#             return HttpResponse(f'Document # {document.number} dd {document.time} has been '
+#                                 f'successfully posted')
+#     except NotEnoughStock as e:
+#         return HttpResponse(repr(e))
+#     except Exception as e:
+#         return HttpResponse(repr(e))
 
 
 # ***************************** Unpost Customers Invoice API view *************************************
 
+# @api_view(['POST'])
+# @permission_classes([IsAuthenticated])
+# def unpost_customers_invoice(request):
+#     try:
+#         document_id = request.data['document']
+#         document = Document.objects.get(public_id=document_id)
+#         if document:
+#             if document.type != 'SI':
+#                 return HttpResponse(f'Document # {document.number} dd {document.time} '
+#                                     f'is not purchase invoice')
+#             if not document.posted:
+#                 return HttpResponse(f'Document # {document.number} dd {document.time} '
+#                                     f'is already unposted')
+#             with transaction.atomic():
+#                 good_transactions = GoodTransaction.objects.filter(document=document)
+#                 for good_transaction in good_transactions:
+#                     card = good_transaction.card
+#                     card.balance += good_transaction.quantity
+#                     card.save()
+#                     good_transaction.delete()
+#                 document.posted = False
+#                 document.save()
+#                 return HttpResponse(f'Document # {document.number} dd {document.time} has been '
+#                                     f'successfully unposted')
+#     except:
+#         return HttpResponse("Something went wrong!")
+
+
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
-def unpost_customers_invoice(request):
-    try:
-        document_id = request.data['document']
-        document = Document.objects.get(public_id=document_id)
-        if document:
-            if document.type != 'SI':
-                return HttpResponse(f'Document # {document.number} dd {document.time} '
-                                    f'is not purchase invoice')
-            if not document.posted:
-                return HttpResponse(f'Document # {document.number} dd {document.time} '
-                                    f'is already unposted')
-            with transaction.atomic():
-                good_transactions = GoodTransaction.objects.filter(document=document)
-                for good_transaction in good_transactions:
-                    card = good_transaction.card
-                    card.balance += good_transaction.quantity
-                    card.save()
-                    good_transaction.delete()
-                document.posted = False
-                document.save()
-                return HttpResponse(f'Document # {document.number} dd {document.time} has been '
-                                    f'successfully unposted')
-    except:
-        return HttpResponse("Something went wrong!")
+def post_invoice_view(request):
+    post_invoice(request)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def unpost_invoice_view(request):
+    unpost_invoice(request)
