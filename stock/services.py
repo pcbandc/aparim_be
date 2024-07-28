@@ -1,6 +1,6 @@
 from django.db.models import Sum
 from django.db import transaction
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from .models import StockCard, GoodTransaction
 from .exceptions import NotEnoughStock
 from .models import Document
@@ -61,8 +61,8 @@ def fifo(good, warehouse, quantity, document, line):
 def post_purchase_invoice(document):
     if document:
         if document.posted:
-            return HttpResponse(f'Document # {document.number} dd {document.time} '
-                                f'has been already posted')
+            return JsonResponse({"data": f'Document # {document.number} dd {document.time} '
+                                f'has been already posted'})
         lines = document.lines.all()
         with transaction.atomic():
             for line in lines:
@@ -80,15 +80,15 @@ def post_purchase_invoice(document):
                                                cost=line.price)
             document.posted = True
             document.save()
-        return HttpResponse(f'Document # {document.number} dd {document.time} has been '
-                            f'successfully posted')
+        return JsonResponse({"data": f'Document # {document.number} dd {document.time} has been '
+                            f'successfully posted'})
 
 
 def unpost_purchase_invoice(document):
     if document:
         if not document.posted:
-            return HttpResponse(f'Document # {document.number} dd {document.time} '
-                                f'is already unposted')
+            return JsonResponse({"data": f'Document # {document.number} dd {document.time} '
+                                f'is already unposted'})
         with transaction.atomic():
             document_transactions = GoodTransaction.objects.filter(document=document)
             cards_ids = document_transactions.values_list("card", flat=True)
@@ -96,36 +96,36 @@ def unpost_purchase_invoice(document):
             cards_transactions = GoodTransaction.objects.filter(card__in=cards_ids)
             cards_consumption_transactions = cards_transactions.exclude(transaction_type='RT')
             if len(cards_consumption_transactions) > 0:
-                return HttpResponse(f'Forbidden! There are following consumption transactions'
-                                    f'recorded on goods received under this document:')
+                return JsonResponse({"data": f'Forbidden! There are following consumption transactions'
+                                    f'recorded on goods received under this document:'})
             document_transactions.delete()
             cards.delete()
             document.posted = False
             document.save()
-        return HttpResponse(f'Document # {document.number} dd {document.time} has been '
-                            f'successfully unposted')
+        return JsonResponse({"data": f'Document # {document.number} dd {document.time} has been '
+                            f'successfully unposted'})
 
 
 def post_sales_invoice(document):
     if document:
         if document.posted:
-            return HttpResponse(f'Document # {document.number} dd {document.time} '
-                                f'has been already posted')
+            return JsonResponse({"data": f'Document # {document.number} dd {document.time} '
+                                f'has been already posted'})
         lines = document.lines.all()
         with transaction.atomic():
             for line in lines:
                 fifo(line.good, line.warehouse, line.quantity, document, line)
             document.posted = True
             document.save()
-        return HttpResponse(f'Document # {document.number} dd {document.time} has been '
-                            f'successfully posted')
+        return JsonResponse({"data": f'Document # {document.number} dd {document.time} has been '
+                            f'successfully posted'})
 
 
 def unpost_sales_invoice(document):
     if document:
         if not document.posted:
-            return HttpResponse(f'Document # {document.number} dd {document.time} '
-                                f'is already unposted')
+            return JsonResponse({"data": f'Document # {document.number} dd {document.time} '
+                                f'is already unposted'})
         with transaction.atomic():
             good_transactions = GoodTransaction.objects.filter(document=document)
             for good_transaction in good_transactions:
@@ -135,8 +135,8 @@ def unpost_sales_invoice(document):
                 good_transaction.delete()
             document.posted = False
             document.save()
-        return HttpResponse(f'Document # {document.number} dd {document.time} has been '
-                            f'successfully unposted')
+        return JsonResponse({"data": f'Document # {document.number} dd {document.time} has been '
+                            f'successfully unposted'})
 
 
 def post_invoice(request):
@@ -150,7 +150,7 @@ def post_invoice(request):
     except NotEnoughStock as e:
         return HttpResponse(repr(e))
     except:
-        return HttpResponse("Something went wrong!")
+        return JsonResponse({"data": "Something went wrong!"})
 
 
 def unpost_invoice(request):
@@ -162,7 +162,7 @@ def unpost_invoice(request):
         if document.type == 'SI':
             return unpost_sales_invoice(document)
     except:
-        return HttpResponse("Something went wrong!")
+        return JsonResponse({"data": "Something went wrong!"})
 
 
 
