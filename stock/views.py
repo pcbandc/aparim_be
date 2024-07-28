@@ -536,10 +536,10 @@ class DocumentLineDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def post_invoice_view(request):
-    post_invoice(request)
+    return HttpResponse(post_invoice(request))
 
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def unpost_invoice_view(request):
-    unpost_invoice(request)
+    return HttpResponse(unpost_invoice(request))

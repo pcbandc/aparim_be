@@ -135,8 +135,8 @@ def unpost_sales_invoice(document):
                 good_transaction.delete()
             document.posted = False
             document.save()
-            return HttpResponse(f'Document # {document.number} dd {document.time} has been '
-                                f'successfully unposted')
+        return HttpResponse(f'Document # {document.number} dd {document.time} has been '
+                            f'successfully unposted')
 
 
 def post_invoice(request):
@@ -144,9 +144,9 @@ def post_invoice(request):
         document_id = request.data['document']
         document = Document.objects.get(public_id=document_id)
         if document.type == 'PI':
-            post_purchase_invoice(document)
+            return post_purchase_invoice(document)
         if document.type == 'SI':
-            post_sales_invoice(document)
+            return post_sales_invoice(document)
     except NotEnoughStock as e:
         return HttpResponse(repr(e))
     except:
@@ -158,9 +158,9 @@ def unpost_invoice(request):
         document_id = request.data['document']
         document = Document.objects.get(public_id=document_id)
         if document.type == 'PI':
-            unpost_purchase_invoice(document)
+            return unpost_purchase_invoice(document)
         if document.type == 'SI':
-            unpost_sales_invoice(document)
+            return unpost_sales_invoice(document)
     except:
         return HttpResponse("Something went wrong!")
 
