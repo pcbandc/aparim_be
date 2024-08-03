@@ -55,6 +55,40 @@ class GoodSerializer(serializers.ModelSerializer):
                   'category_id', 'active']
 
 
+class StockReportSerializer(serializers.ModelSerializer):
+    id = serializers.UUIDField(source='public_id',
+                               read_only=True,
+                               format='hex')
+    shortName = serializers.CharField(source='short_name')
+    category = serializers.CharField(source='category.name',
+                                     read_only=True)
+    category_id = serializers.UUIDField(source='category.public_id',
+                                        read_only=True,
+                                        format='hex')
+    basic_uom = serializers.CharField(source='basic_uom.short_name',
+                                      read_only=True)
+    basic_uom_id = serializers.UUIDField(source='basic_uom.public_id',
+                                         read_only=True,
+                                         format='hex')
+    inflow_total_count = serializers.IntegerField()
+    inflow_total_sum = serializers.DecimalField(max_digits=12, decimal_places=2)
+    outflow_total_count = serializers.IntegerField()
+    outflow_total_sum = serializers.DecimalField(max_digits=12, decimal_places=2)
+    start_balance_count = serializers.IntegerField()
+    start_balance_sum = serializers.DecimalField(max_digits=12, decimal_places=2)
+    end_balance_count = serializers.IntegerField()
+    end_balance_sum = serializers.DecimalField(max_digits=12, decimal_places=2)
+
+    class Meta:
+        model = Good
+        fields = ['id', 'outer_id', 'uktzed', 'basic_uom', 'basic_uom_id',
+                  'vat_rate', 'shortName', 'full_name', 'category',
+                  'category_id', 'active', 'start_balance_count',
+                  'start_balance_sum', 'inflow_total_count', 'inflow_total_sum',
+                  'outflow_total_count', 'outflow_total_sum',
+                  'end_balance_count', 'end_balance_sum']
+
+
 class StockCardSerializer(serializers.ModelSerializer):
     id = serializers.UUIDField(source='public_id', read_only=True, format='hex')
     good = serializers.UUIDField(source='good.public_id', read_only=True,

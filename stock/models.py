@@ -23,7 +23,9 @@ GOOD_TRANSACTION_TYPE = {
     'CN': 'Credit note',
     'DN': 'Debit note',
     'WO': 'Write off',
-    'MG': 'Moving goods'
+    'MT': 'Moving goods to',
+    'MF': 'Moving goods from',
+
 }
 DOCUMENT_TYPE = {
     "PI": "Purchase invoice",
