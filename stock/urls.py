@@ -26,5 +26,5 @@ urlpatterns = [
     path('document_lines/<str:pk>/', DocumentLineDetailAPIView.as_view()),
     path('invoice/post/', post_invoice_view),
     path('invoice/unpost/', unpost_invoice_view),
-    path('stock_report', stock_report_view)
+    path('stock_report', stock_report_view),
 ]

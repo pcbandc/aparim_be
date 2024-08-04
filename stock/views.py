@@ -416,4 +416,6 @@ def unpost_invoice_view(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def stock_report_view(request):
-    return HttpResponse(stock_report(request))
+    return stock_report(request)
+
+

@@ -3,7 +3,9 @@ import pytz
 from django.db.models import Sum, Count, When, Case, F, Q
 from django.db import transaction
 from django.http import HttpResponse, JsonResponse
-from .models import StockCard, GoodTransaction, Good
+from django.utils.datastructures import MultiValueDictKeyError
+
+from .models import StockCard, GoodTransaction, Good, Category
 from .serializers import GoodSerializer, StockReportSerializer
 from .exceptions import NotEnoughStock
 from .models import Document
@@ -171,12 +173,9 @@ def unpost_invoice(request):
         return JsonResponse({"data": "Something went wrong!"})
 
 
-def stock_report_period_warehouse_category():
+def stock_report_period_warehouse_category(start_date, end_date, categories,
+                                           warehouses):
     serializer = StockReportSerializer
-    start_date = datetime.combine(datetime(2024, 6, 3), time.min, tzinfo=pytz.UTC)
-    end_date = datetime.combine(datetime(2024, 6, 5), time.max, tzinfo=pytz.UTC)
-    warehouses = [1]
-    categories = [4]
     goods = Good.objects.filter(category__in=categories).annotate(
         start_balance_count=Sum(
             Case(
@@ -291,5 +290,32 @@ def stock_report_period_warehouse_category():
 
 
 def stock_report(request):
-    return JsonResponse({'report': stock_report_period_warehouse_category()})
+    try:
+        start_date_param = request.GET['start_date']
+        end_date_param = request.GET['end_date']
+        categories_param = request.GET['categories']
+        warehouses_param = request.GET['warehouses']
+        start_date = datetime.combine(
+            datetime.strptime(start_date_param, '%d-%m-%Y'),
+            time.min, tzinfo=pytz.UTC
+        )
+        end_date = datetime.combine(
+            datetime.strptime(end_date_param, '%d-%m-%Y'),
+            time.max, tzinfo=pytz.UTC
+        )
+        categories = categories_param.split(',')
+        warehouses = warehouses_param.split(',')
+        return JsonResponse(
+            stock_report_period_warehouse_category(
+                start_date, end_date, categories, warehouses),
+            safe=False
+        )
+    except ValueError as e:
+        return JsonResponse({'error': repr(e)})
+    except MultiValueDictKeyError as e:
+        return JsonResponse({'error': repr(e)})
+    except Exception as e:
+        return JsonResponse({'error': repr(e)})
+
+
 

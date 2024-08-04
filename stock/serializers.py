@@ -70,13 +70,13 @@ class StockReportSerializer(serializers.ModelSerializer):
     basic_uom_id = serializers.UUIDField(source='basic_uom.public_id',
                                          read_only=True,
                                          format='hex')
-    inflow_total_count = serializers.IntegerField()
+    inflow_total_count = serializers.DecimalField(max_digits=12, decimal_places=3)
     inflow_total_sum = serializers.DecimalField(max_digits=12, decimal_places=2)
-    outflow_total_count = serializers.IntegerField()
+    outflow_total_count = serializers.DecimalField(max_digits=12, decimal_places=3)
     outflow_total_sum = serializers.DecimalField(max_digits=12, decimal_places=2)
-    start_balance_count = serializers.IntegerField()
+    start_balance_count = serializers.DecimalField(max_digits=12, decimal_places=3)
     start_balance_sum = serializers.DecimalField(max_digits=12, decimal_places=2)
-    end_balance_count = serializers.IntegerField()
+    end_balance_count = serializers.DecimalField(max_digits=12, decimal_places=3)
     end_balance_sum = serializers.DecimalField(max_digits=12, decimal_places=2)
 
     class Meta:
