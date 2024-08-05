@@ -70,14 +70,38 @@ class StockReportSerializer(serializers.ModelSerializer):
     basic_uom_id = serializers.UUIDField(source='basic_uom.public_id',
                                          read_only=True,
                                          format='hex')
-    inflow_total_count = serializers.DecimalField(max_digits=12, decimal_places=3)
-    inflow_total_sum = serializers.DecimalField(max_digits=12, decimal_places=2)
-    outflow_total_count = serializers.DecimalField(max_digits=12, decimal_places=3)
-    outflow_total_sum = serializers.DecimalField(max_digits=12, decimal_places=2)
-    start_balance_count = serializers.DecimalField(max_digits=12, decimal_places=3)
-    start_balance_sum = serializers.DecimalField(max_digits=12, decimal_places=2)
-    end_balance_count = serializers.DecimalField(max_digits=12, decimal_places=3)
-    end_balance_sum = serializers.DecimalField(max_digits=12, decimal_places=2)
+    inflow_total_count = serializers.SerializerMethodField()
+    inflow_total_sum = serializers.SerializerMethodField()
+    outflow_total_count = serializers.SerializerMethodField()
+    outflow_total_sum = serializers.SerializerMethodField()
+    start_balance_count = serializers.SerializerMethodField()
+    start_balance_sum = serializers.SerializerMethodField()
+    end_balance_count = serializers.SerializerMethodField()
+    end_balance_sum = serializers.SerializerMethodField()
+
+    def get_inflow_total_count(self, instance):
+        return instance.inflow_total_count if instance.inflow_total_count else ''
+
+    def get_inflow_total_sum(self, instance):
+        return instance.inflow_total_sum if instance.inflow_total_sum else ''
+
+    def get_outflow_total_count(self, instance):
+        return instance.outflow_total_count if instance.outflow_total_count else ''
+
+    def get_outflow_total_sum(self, instance):
+        return instance.outflow_total_sum if instance.outflow_total_sum else ''
+
+    def get_start_balance_count(self, instance):
+        return instance.start_balance_count if instance.start_balance_count else ''
+
+    def get_start_balance_sum(self, instance):
+        return instance.start_balance_sum if instance.start_balance_sum else ''
+
+    def get_end_balance_count(self, instance):
+        return instance.end_balance_count if instance.end_balance_count else ''
+
+    def get_end_balance_sum(self, instance):
+        return instance.end_balance_sum if instance.end_balance_sum else ''
 
     class Meta:
         model = Good
