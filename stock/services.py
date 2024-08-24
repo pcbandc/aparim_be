@@ -5,7 +5,7 @@ from django.db import transaction
 from django.http import HttpResponse, JsonResponse
 from django.utils.datastructures import MultiValueDictKeyError
 
-from .models import StockCard, GoodTransaction, Good, Category
+from .models import StockCard, GoodTransaction, Good, Category, Warehouse
 from .serializers import GoodSerializer, StockReportSerializer
 from .exceptions import NotEnoughStock
 from .models import Document
@@ -176,6 +176,8 @@ def unpost_invoice(request):
 def stock_report_period_warehouse_category(start_date, end_date, categories,
                                            warehouses):
     serializer = StockReportSerializer
+    if warehouses[0] == 'All':
+        warehouses = Warehouse.objects.all()
     goods = Good.objects.filter(category__in=categories).annotate(
         start_balance_count=Sum(
             Case(

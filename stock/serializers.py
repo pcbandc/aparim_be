@@ -12,6 +12,14 @@ class WarehouseSerializer(serializers.ModelSerializer):
         fields = ['id', 'shortName', 'type', 'active', 'address']
 
 
+class WarehouseSimpleSerializer(serializers.ModelSerializer):
+    shortName = serializers.CharField(source='name')
+
+    class Meta:
+        model = Warehouse
+        fields = ['id', 'shortName']
+
+
 class CategorySerializer(serializers.ModelSerializer):
     id = serializers.UUIDField(source='public_id', read_only=True, format='hex')
     shortName = serializers.CharField(source="name")

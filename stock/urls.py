@@ -4,11 +4,12 @@ from .views import WarehouseListAPIView, WarehouseDetailAPIView, CategoryListAPI
     GoodDetailAPIView, StockCardListAPIView, StockCardDetailAPIView, \
     DocumentListAPIView, DocumentDetailAPIView, GoodTransactionListAPIView, \
     GoodTransactionDetailAPIView, DocumentLineListAPIView, DocumentLineDetailAPIView, \
-    post_invoice_view, unpost_invoice_view, stock_report_view
+    post_invoice_view, unpost_invoice_view, stock_report_view, WarehouseSimpleListAPIView
 
 
 urlpatterns = [
     path('warehouses/', WarehouseListAPIView.as_view()),
+    path('warehouses_s/', WarehouseSimpleListAPIView.as_view()),
     path('warehouses/<str:pk>/', WarehouseDetailAPIView.as_view()),
     path('categories/', CategoryListAPIView.as_view()),
     path('categories/<str:pk>/', CategoryDetailAPIView.as_view()),

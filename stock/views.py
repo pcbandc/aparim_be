@@ -8,7 +8,7 @@ from .models import Warehouse, Category, Uom, Good, StockCard, Document, \
     GoodTransaction, DocumentLine
 from .serializers import WarehouseSerializer, CategorySerializer, UomSerializer, \
     GoodSerializer, StockCardSerializer, DocumentSerializer, GoodTransactionSerializer,\
-    DocumentLineSerializer
+    DocumentLineSerializer, WarehouseSimpleSerializer
 from counterparties.models import Counterparty, Agreement
 from .services import post_invoice, unpost_invoice, stock_report
 
@@ -17,6 +17,12 @@ from .services import post_invoice, unpost_invoice, stock_report
 class WarehouseListAPIView(generics.ListCreateAPIView):
     queryset = Warehouse.objects.all()
     serializer_class = WarehouseSerializer
+    permission_classes = [IsAuthenticated]
+
+
+class WarehouseSimpleListAPIView(generics.ListCreateAPIView):
+    queryset = Warehouse.objects.all()
+    serializer_class = WarehouseSimpleSerializer
     permission_classes = [IsAuthenticated]
 
 
