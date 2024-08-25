@@ -50,7 +50,7 @@ class Category(MPTTModel):
     public_id = models.UUIDField(db_index=True, unique=True, default=uuid.uuid4)
     name = models.CharField(max_length=50, unique=True)
     parent = TreeForeignKey('self', on_delete=models.CASCADE, null=True,
-                            blank=True, related_name='children')
+                            blank=True, related_name='subcategories')
 
     def __str__(self):
         return f'{self.name}'

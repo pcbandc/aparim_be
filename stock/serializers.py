@@ -30,6 +30,20 @@ class CategorySerializer(serializers.ModelSerializer):
         fields = ['id', 'shortName', 'parent']
 
 
+class SubCategoryRecursiveSerializer(serializers.ModelSerializer):
+    def to_representation(self, instance):
+        serializer = self.parent.parent.__class__(instance, context=self.context)
+        return serializer.data
+
+
+class CategorySerializerTree(serializers.ModelSerializer):
+    subcategories = SubCategoryRecursiveSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Category
+        fields = ('id', 'name', 'subcategories')
+
+
 class UomSerializer(serializers.ModelSerializer):
     id = serializers.UUIDField(source='public_id', read_only=True, format='hex')
     shortName = serializers.CharField(source='short_name')

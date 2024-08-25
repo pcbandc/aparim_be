@@ -7,8 +7,8 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from .models import Warehouse, Category, Uom, Good, StockCard, Document, \
     GoodTransaction, DocumentLine
 from .serializers import WarehouseSerializer, CategorySerializer, UomSerializer, \
-    GoodSerializer, StockCardSerializer, DocumentSerializer, GoodTransactionSerializer,\
-    DocumentLineSerializer, WarehouseSimpleSerializer
+    GoodSerializer, StockCardSerializer, DocumentSerializer, GoodTransactionSerializer, \
+    DocumentLineSerializer, WarehouseSimpleSerializer, CategorySerializerTree
 from counterparties.models import Counterparty, Agreement
 from .services import post_invoice, unpost_invoice, stock_report
 
@@ -67,6 +67,11 @@ class CategoryListAPIView(generics.ListCreateAPIView):
             serializer.save(parent=parent)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class CategoriesAPIViewTree(generics.ListAPIView):
+    queryset = Category.objects.filter(parent_id=None)
+    serializer_class = CategorySerializerTree
 
 
 class CategoryDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
