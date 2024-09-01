@@ -178,7 +178,9 @@ def stock_report_period_warehouse_category(start_date, end_date, categories,
     serializer = StockReportSerializer
     if warehouses[0] == 'All':
         warehouses = Warehouse.objects.all()
-    goods = Good.objects.filter(category__in=categories).annotate(
+    goods_filtered_by_category = Good.objects.all() if categories == 'All' else \
+        Good.objects.filter(category__in=categories)
+    goods = goods_filtered_by_category.annotate(
         start_balance_count=Sum(
             Case(
                 When(

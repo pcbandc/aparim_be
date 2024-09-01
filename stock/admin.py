@@ -1,5 +1,6 @@
 from django.contrib import admin
 from import_export.admin import ImportExportModelAdmin
+from mptt.admin import MPTTModelAdmin
 from .models import Warehouse, Category, Uom, Good, StockCard, GoodTransaction,\
     Document, DocumentLine
 
@@ -10,8 +11,8 @@ class WarehouseAdmin(ImportExportModelAdmin):
 
 
 @admin.register(Category)
-class CategoryAdmin(ImportExportModelAdmin):
-    list_display = ('public_id', 'name', 'parent')
+class CategoryAdmin(ImportExportModelAdmin, MPTTModelAdmin):
+    list_display = ('name', 'parent', 'public_id', )
 
 
 @admin.register(Uom)

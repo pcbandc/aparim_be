@@ -37,11 +37,12 @@ class SubCategoryRecursiveSerializer(serializers.ModelSerializer):
 
 
 class CategorySerializerTree(serializers.ModelSerializer):
-    subcategories = SubCategoryRecursiveSerializer(many=True, read_only=True)
+    # id = serializers.UUIDField(source='public_id', read_only=True, format='hex')
+    children = SubCategoryRecursiveSerializer(many=True, read_only=True)
 
     class Meta:
         model = Category
-        fields = ('id', 'name', 'subcategories')
+        fields = ('id', 'name', 'children')
 
 
 class UomSerializer(serializers.ModelSerializer):
